@@ -20,10 +20,24 @@ public class Network {
         int discriminator = 0;
         CHANNEL.registerMessage(
             discriminator++,
-            PlaySoundMessage.class,
-            PlaySoundMessage::encode,
-            PlaySoundMessage::new,
-            PlaySoundMessage::handle
+            ToggleSoundMessage.class,
+            ToggleSoundMessage::encode,
+            ToggleSoundMessage::new,
+            ToggleSoundMessage::handle
+        );
+        CHANNEL.registerMessage(
+            discriminator++,
+            SyncBoomboxTileEntity.class,
+            SyncBoomboxTileEntity::encode,
+            SyncBoomboxTileEntity::new,
+            SyncBoomboxTileEntity::handle
+        );
+        CHANNEL.registerMessage(
+            discriminator++,
+            AddSoundMessage.class,
+            AddSoundMessage::encode,
+            AddSoundMessage::new,
+            AddSoundMessage::handle
         );
     }
 

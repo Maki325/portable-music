@@ -2,62 +2,111 @@ package me.maki325.mcmods.portablemusic.common.blockentities;
 
 import com.google.common.base.MoreObjects;
 import me.maki325.mcmods.portablemusic.common.blocks.PMBlocks;
-import me.maki325.mcmods.portablemusic.common.capabilities.boombox.BoomboxProvider;
-import me.maki325.mcmods.portablemusic.common.capabilities.boombox.IBoomboxCapability;
+import me.maki325.mcmods.portablemusic.common.sound.Sound;
+import me.maki325.mcmods.portablemusic.server.ServerSoundManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.util.LazyOptional;
-
-import static me.maki325.mcmods.portablemusic.common.Utils.getStringOr;
+import org.jetbrains.annotations.Nullable;
+import static me.maki325.mcmods.portablemusic.common.Utils.getSoundFromItemStack;
 
 public class BoomboxBlockEntity extends BlockEntity {
 
     public static final Block[] VALID_BLOCKS = { PMBlocks.BOOMBOX_BLOCK.get() };
 
-    String sound = "";
+    ItemStack disc;
     double time = 0;
+    int soundId;
+    Sound sound;
 
     public BoomboxBlockEntity(BlockPos pos, BlockState state) {
         super(PMBlockEntities.BOOMBOX_BLOCKENTITY.get(), pos, state);
     }
 
+    @Override
+    public CompoundTag getUpdateTag() {
+        return save(new CompoundTag());
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag) {
+        super.handleUpdateTag(tag);
+        load(tag);
+    }
+
     @Override protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        tag.putString("sound", sound == null ? "" : sound);
+        save(tag);
+    }
+
+    public CompoundTag save(CompoundTag tag) {
         tag.putDouble("time", time);
+
+        boolean hasDisc = disc != null;
+        tag.putBoolean("hasDisc", hasDisc);
+        if(hasDisc) {
+            tag.put("disc", disc.save(new CompoundTag()));
+        }
+        tag.putInt("soundId", soundId);
+        return tag;
+    }
+
+    @Override public void load(CompoundTag tag) {
+        super.load(tag);
+        this.time = tag.getDouble("time");
+
+        if(tag.getBoolean("hasDisc")) {
+            disc = ItemStack.of(tag.getCompound("disc"));
+        } else {
+            disc = null;
+        }
+        soundId = tag.getInt("soundId");
+        sound = ServerSoundManager.getInstance().getSound(soundId);
     }
 
     @Override public void saveToItem(ItemStack itemStack) {
         super.saveToItem(itemStack);
 
-        IBoomboxCapability iBoomboxCapability =
-                itemStack.getCapability(BoomboxProvider.BOOMBOX_CAPABILITY).orElse(null);
-        if (iBoomboxCapability == null) return;
+        CompoundTag tag = itemStack.getOrCreateTag();
 
-        System.out.println("playerDestroy boomboxBlockEntity: " + this);
-        System.out.println("playerDestroy iBoomboxCapability before: " + iBoomboxCapability);
-        iBoomboxCapability.setSound(getSound());
-        iBoomboxCapability.setTime(getTime());
-        iBoomboxCapability.setTime(5);
-        System.out.println("playerDestroy iBoomboxCapability after: " + iBoomboxCapability);
+        tag.putDouble("time", getTime());
+
+        boolean hasDisc = disc != null;
+        tag.putBoolean("hasDisc", hasDisc);
+        if(hasDisc) {
+            tag.put("disc", disc.save(new CompoundTag()));
+        }
+        tag.putInt("soundId", soundId);
     }
 
-    @Override public void load(CompoundTag tag) {
-        super.load(tag);
-        this.sound = getStringOr(tag, "sound", "");
-        this.time = tag.getDouble("time");
+    public void readFromItem(ItemStack itemStack) {
+        CompoundTag tag = itemStack.getOrCreateTag();
+        setTime(tag.getDouble("time"));
+
+        if(tag.getBoolean("hasDisc")) {
+            disc = ItemStack.of(tag.getCompound("disc"));
+        } else {
+            disc = null;
+        }
+        soundId = tag.getInt("soundId");
+        sound = ServerSoundManager.getInstance().getSound(soundId);
     }
 
     public String getSound() {
-        return sound;
-    }
-
-    public void setSound(String sound) {
-        this.sound = sound;
+        return getSoundFromItemStack(disc);
     }
 
     public double getTime() {
@@ -66,6 +115,16 @@ public class BoomboxBlockEntity extends BlockEntity {
 
     public void setTime(double time) {
         this.time = time;
+    }
+
+    public ItemStack getDisc() {
+        return disc;
+    }
+
+    public void setDisc(ItemStack disc) {
+        this.disc = disc.copy();
+        this.disc.setCount(1);
+        setChanged();
     }
 
     @Override public String toString() {

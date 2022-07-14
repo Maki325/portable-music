@@ -3,6 +3,7 @@ package me.maki325.mcmods.portablemusic.common.capabilities.boombox;
 import com.google.common.base.MoreObjects;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.util.INBTSerializable;
+
 import static me.maki325.mcmods.portablemusic.common.Utils.getStringOr;
 
 public class BoomboxCapability implements IBoomboxCapability, INBTSerializable<CompoundTag> {
