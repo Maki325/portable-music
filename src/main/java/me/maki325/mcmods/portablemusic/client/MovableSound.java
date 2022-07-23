@@ -22,7 +22,6 @@ public class MovableSound extends AbstractTickableSoundInstance {
     }
 
     @Override public void tick() {
-        System.out.println("MovableSound tick client! location: " + location);
         if(source != null) {
             this.x = this.source.getX();
             this.y = this.source.getY();

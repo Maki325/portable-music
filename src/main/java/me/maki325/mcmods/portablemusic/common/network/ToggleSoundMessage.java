@@ -34,5 +34,6 @@ public class ToggleSoundMessage {
         } else {
             ctx.get().enqueueWork(() -> ClientSoundManager.getInstance().handleMessage(this));
         }
+        ctx.get().setPacketHandled(true);
     }
 }

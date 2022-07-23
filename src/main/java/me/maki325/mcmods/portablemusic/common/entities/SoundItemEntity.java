@@ -31,17 +31,6 @@ public class SoundItemEntity extends ItemEntity {
         startSound();
     }
 
-    public SoundItemEntity(Level p_32001_, double p_32002_, double p_32003_, double p_32004_, ItemStack p_32005_, int soundId) {
-        super(p_32001_, p_32002_, p_32003_, p_32004_, p_32005_);
-        this.soundId = soundId;
-        this.sound = ServerSoundManager.getInstance().getSound(this.soundId);
-
-        this.sound.playerUUID = null;
-        ServerSoundManager.getInstance().updateSound(this.soundId, this.sound);
-
-        ServerSoundManager.getInstance().playSound(this.soundId);
-    }
-
     public SoundItemEntity(Level p_149663_, double p_149664_, double p_149665_, double p_149666_, ItemStack p_149667_, double p_149668_, double p_149669_, double p_149670_) {
         super(p_149663_, p_149664_, p_149665_, p_149666_, p_149667_, p_149668_, p_149669_, p_149670_);
         startSound();
@@ -51,11 +40,20 @@ public class SoundItemEntity extends ItemEntity {
         if(this.level.isClientSide) return;
         CompoundTag tag = getItem().getOrCreateTag();
         if(!tag.getBoolean("hasDisc")) return;
-        BlockPos pos = new BlockPos(this.getPosition(0));
-        String sound = getSoundFromItemStack(ItemStack.of(tag.getCompound("disc")));
+        this.soundId = tag.getInt("soundId");
+        if(this.soundId == 0) {
+            BlockPos pos = new BlockPos(this.getPosition(0));
+            String sound = getSoundFromItemStack(ItemStack.of(tag.getCompound("disc")));
 
-        this.sound = new Sound(sound, this.level, vec3iToVec3(pos), SoundState.PAUSED);
-        this.soundId = ServerSoundManager.getInstance().addSound(this.sound);
+            this.sound = new Sound(sound, this.level.dimension(), vec3iToVec3(pos), SoundState.PAUSED);
+            this.soundId = ServerSoundManager.getInstance().addSound(this.sound);
+
+            tag.putInt("soundId", soundId);
+        } else {
+            this.sound = ServerSoundManager.getInstance().getSound(this.soundId);
+            this.sound.playerUUID = null;
+            ServerSoundManager.getInstance().updateSound(this.soundId, this.sound);
+        }
         ServerSoundManager.getInstance().playSound(this.soundId);
     }
 

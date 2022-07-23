@@ -91,6 +91,8 @@ public class ClientSoundManager extends AbstractSoundManager {
         }
     }
 
+    @Override public void setDirty() {}
+
     private static final ClientSoundManager soundManager = new ClientSoundManager();
 
     public static ClientSoundManager getInstance() {

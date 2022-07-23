@@ -17,18 +17,21 @@ public abstract class AbstractSoundManager implements ISoundManager {
         while(sounds.containsKey(soundId) || soundId == 0) soundId = random.nextInt();
 
         sounds.put(soundId, sound);
+        setDirty();
         return soundId;
     }
 
     @Override
     public int addSound(int soundId, Sound sound) {
         sounds.put(soundId, sound);
+        setDirty();
         return soundId;
     }
 
     @Override
     public void updateSound(int soundId, Sound sound) {
         sounds.put(soundId, sound);
+        setDirty();
     }
 
     @Nullable
@@ -37,8 +40,7 @@ public abstract class AbstractSoundManager implements ISoundManager {
         return sounds.get(soundId);
     }
 
-    @Override
-    public Sound getSound(Predicate<Sound> filter) {
+    @Override public Sound getSound(Predicate<Sound> filter) {
         for(var pair : sounds.entrySet()) {
             if(filter.test(pair.getValue()))
                 return pair.getValue();
@@ -46,12 +48,20 @@ public abstract class AbstractSoundManager implements ISoundManager {
         return null;
     }
 
-    @Override
-    public Integer getSoundId(Predicate<Sound> filter) {
+    @Override public Integer getSoundId(Predicate<Sound> filter) {
         for(var pair : sounds.entrySet()) {
             if(filter.test(pair.getValue()))
                 return pair.getKey();
         }
         return null;
     }
+
+    @Override public HashMap<Integer, Sound> getSounds() {
+        return sounds;
+    }
+
+    @Override public void setSounds(HashMap<Integer, Sound> sounds) {
+        this.sounds = sounds;
+    }
+
 }

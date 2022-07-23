@@ -47,5 +47,6 @@ public class AddSoundMessage {
             ctx.get().enqueueWork(() ->
                     ClientSoundManager.getInstance().addSound(soundId, sound));
         }
+        ctx.get().setPacketHandled(true);
     }
 }

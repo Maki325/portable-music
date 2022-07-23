@@ -3,6 +3,7 @@ package me.maki325.mcmods.portablemusic.common.sound;
 import me.maki325.mcmods.portablemusic.common.network.ToggleSoundMessage;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.function.Predicate;
 
 public interface ISoundManager {
@@ -17,6 +18,9 @@ public interface ISoundManager {
     @Nullable Sound getSound(int soundId);
     @Nullable Sound getSound(Predicate<Sound> filter);
     @Nullable Integer getSoundId(Predicate<Sound> filter);
+    HashMap<Integer, Sound> getSounds();
+    void setSounds(HashMap<Integer, Sound> sounds);
+    void setDirty();
 
     void handleMessage(ToggleSoundMessage message);
 

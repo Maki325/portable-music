@@ -3,6 +3,7 @@ package me.maki325.mcmods.portablemusic.common.blockentities;
 import com.google.common.base.MoreObjects;
 import me.maki325.mcmods.portablemusic.common.blocks.PMBlocks;
 import me.maki325.mcmods.portablemusic.common.sound.Sound;
+import me.maki325.mcmods.portablemusic.common.sound.SoundState;
 import me.maki325.mcmods.portablemusic.server.ServerSoundManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import static me.maki325.mcmods.portablemusic.common.Utils.getSoundFromItemStack;
+import static me.maki325.mcmods.portablemusic.common.Utils.vec3iToVec3;
 
 public class BoomboxBlockEntity extends BlockEntity {
 
@@ -102,7 +104,16 @@ public class BoomboxBlockEntity extends BlockEntity {
             disc = null;
         }
         soundId = tag.getInt("soundId");
-        sound = ServerSoundManager.getInstance().getSound(soundId);
+        if(soundId != 0) {
+            sound = ServerSoundManager.getInstance().getSound(soundId);
+        } else if(disc != null) {
+            sound = new Sound(getSound(), this.level.dimension(), vec3iToVec3(this.worldPosition), SoundState.PAUSED);
+            soundId = ServerSoundManager.getInstance().addSound(sound);
+        }
+    }
+
+    public void play() {
+        ServerSoundManager.getInstance().playSound(soundId);
     }
 
     public String getSound() {

@@ -91,9 +91,11 @@ public class BoomboxBlock extends Block implements EntityBlock {
         if(!(itemStack.getItem() instanceof RecordItem)) {
             level.getBlockEntity(blockPos, PMBlockEntities.BOOMBOX_BLOCKENTITY.get())
             .ifPresent(blockEntity -> {
+                blockEntity.play();
                 String s = blockEntity.getSound() == null ? "No Sound" : ("Sound: " + blockEntity.getSound());
                 player.sendSystemMessage(Component.literal(s));
             });
+
             return InteractionResult.PASS;
         }
 
