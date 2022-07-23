@@ -110,6 +110,12 @@ public class BoomboxBlockEntity extends BlockEntity {
             sound = new Sound(getSound(), this.level.dimension(), vec3iToVec3(this.worldPosition), SoundState.PAUSED);
             soundId = ServerSoundManager.getInstance().addSound(sound);
         }
+
+        if(soundId != 0 && sound != null) {
+            sound.location = vec3iToVec3(getBlockPos());
+            sound.playerUUID = null;
+            ServerSoundManager.getInstance().updateSound(soundId, sound);
+        }
     }
 
     public void play() {
