@@ -3,7 +3,6 @@ package me.maki325.mcmods.portablemusic.common.network;
 import me.maki325.mcmods.portablemusic.client.ClientSoundManager;
 import me.maki325.mcmods.portablemusic.common.sound.Sound;
 import me.maki325.mcmods.portablemusic.common.sound.SoundState;
-import me.maki325.mcmods.portablemusic.server.ServerSoundManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;

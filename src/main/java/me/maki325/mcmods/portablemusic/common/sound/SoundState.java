@@ -1,6 +1,7 @@
 package me.maki325.mcmods.portablemusic.common.sound;
 
 public enum SoundState {
+    NONE(0),
     PLAYING(1),
     PAUSED(2),
     STOPPED(3),
@@ -8,6 +9,7 @@ public enum SoundState {
 
     public static SoundState getSoundState(int value) {
         return switch (value) {
+            case 0 -> NONE;
             case 1 -> PLAYING;
             case 2 -> PAUSED;
             case 3 -> STOPPED;

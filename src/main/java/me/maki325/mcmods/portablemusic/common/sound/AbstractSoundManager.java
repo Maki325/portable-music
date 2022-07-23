@@ -64,4 +64,8 @@ public abstract class AbstractSoundManager implements ISoundManager {
         this.sounds = sounds;
     }
 
+    @Override
+    public void clear() {
+        sounds.clear();
+    }
 }

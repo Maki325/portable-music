@@ -6,6 +6,7 @@ import me.maki325.mcmods.portablemusic.common.blocks.PMBlocks;
 import me.maki325.mcmods.portablemusic.common.capabilities.boombox.BoomboxProvider;
 import me.maki325.mcmods.portablemusic.common.capabilities.boombox.CapabilityHandler;
 import me.maki325.mcmods.portablemusic.common.capabilities.boombox.IBoomboxCapability;
+import me.maki325.mcmods.portablemusic.common.commands.PMCommands;
 import me.maki325.mcmods.portablemusic.common.items.PMItems;
 import me.maki325.mcmods.portablemusic.common.network.Network;
 import net.minecraft.client.Minecraft;
@@ -43,6 +44,7 @@ public class PortableMusic {
         PMBlocks.register();
         PMItems.register();
         PMBlockEntities.register();
+        PMCommands.register();
 
         MinecraftForge.EVENT_BUS.register(this);
     }

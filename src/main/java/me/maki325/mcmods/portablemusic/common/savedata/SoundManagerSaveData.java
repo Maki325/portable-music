@@ -6,7 +6,6 @@ import me.maki325.mcmods.portablemusic.common.sound.Sound;
 import me.maki325.mcmods.portablemusic.server.ServerSoundManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 
 public class SoundManagerSaveData extends SavedData {
@@ -27,9 +26,12 @@ public class SoundManagerSaveData extends SavedData {
         if(!tag.contains("sounds")) return;
         var sounds = ServerSoundManager.getInstance().getSounds();
         var soundsTag = tag.getCompound("sounds");
-        soundsTag.getAllKeys().forEach(key ->
-            sounds.put(Integer.parseInt(key.split("_")[1]),
-                Sound.create(tag.getCompound(key))));
+        soundsTag.getAllKeys().forEach(key -> {
+            var sound = Sound.create(soundsTag.getCompound(key));
+            int soundId = Integer.parseInt(key.split("_")[1]);
+            sounds.put(soundId, sound);
+        });
+        ServerSoundManager.getInstance().sync();
     }
 
     public static SoundManagerSaveData getData(ServerLevel level) {

@@ -3,8 +3,6 @@ package me.maki325.mcmods.portablemusic.common.sound;
 import com.google.common.base.MoreObjects;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 

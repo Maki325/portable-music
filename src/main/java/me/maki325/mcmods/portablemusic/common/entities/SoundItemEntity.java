@@ -60,6 +60,7 @@ public class SoundItemEntity extends ItemEntity {
     @Override
     public void tick() {
         super.tick();
+        if(this.sound == null) return;
         Vec3 position = vec3iToVec3(new BlockPos(this.getPosition(0)));
         if(this.sound.location != null && this.sound.location.distanceTo(position) < 1) return;
         this.sound.location = position;

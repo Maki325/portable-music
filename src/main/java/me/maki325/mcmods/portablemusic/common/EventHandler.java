@@ -4,13 +4,13 @@ import me.maki325.mcmods.portablemusic.PortableMusic;
 import me.maki325.mcmods.portablemusic.common.entities.SoundItemEntity;
 import me.maki325.mcmods.portablemusic.common.items.PMItems;
 import me.maki325.mcmods.portablemusic.common.savedata.SoundManagerSaveData;
-import me.maki325.mcmods.portablemusic.common.sound.Sound;
 import me.maki325.mcmods.portablemusic.server.ServerSoundManager;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -48,17 +48,16 @@ public class EventHandler {
     @SubscribeEvent
     public static void onServerStart(ServerStartedEvent event) {
         ServerSoundManager.init(event.getServer());
-        var stuff = event.getServer().overworld().getDataStorage().computeIfAbsent(
-                EventHandler::loadSoundManagerSaveData,
-                EventHandler::createSoundManagerSaveData,
-                PortableMusic.MODID + "_sound_manager");
+        event.getServer().overworld().getDataStorage().computeIfAbsent(
+            EventHandler::loadSoundManagerSaveData,
+            EventHandler::createSoundManagerSaveData,
+            PortableMusic.MODID + "_sound_manager");
 
-        System.out.println("onServerStart: SOUNDS!");
-        for(var sound : ServerSoundManager.getInstance().getSounds().entrySet()) {
-            System.out.println("Sound: (id: " + sound.getKey() + ", sound: " + sound.getValue() + ")");
-        }
-        System.out.println("onServerStart: SOUNDS END!");
-        System.out.println("onServerStart: END");
+    }
+
+    @SubscribeEvent public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+        if(!(event.getEntity() instanceof ServerPlayer)) return;
+        ServerSoundManager.getInstance().sync();
     }
 
 }

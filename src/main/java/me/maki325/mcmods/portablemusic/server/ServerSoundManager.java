@@ -9,6 +9,7 @@ import me.maki325.mcmods.portablemusic.common.sound.Sound;
 import me.maki325.mcmods.portablemusic.common.sound.SoundState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.network.PacketDistributor;
+
 import static me.maki325.mcmods.portablemusic.common.Utils.vec3ToBlockPos;
 
 public class ServerSoundManager extends AbstractSoundManager {
@@ -58,10 +59,31 @@ public class ServerSoundManager extends AbstractSoundManager {
         return true;
     }
 
+    @Override public boolean setSoundState(int soundId, SoundState soundState) {
+        var sound = sounds.get(soundId);
+        if(sound == null) return false;
+        sound.soundState = soundState;
+
+        Network.CHANNEL.send(
+            getMessageTarget(sound),
+            new ToggleSoundMessage(soundId, soundState)
+        );
+        setDirty();
+
+        return true;
+    }
+
     @Override public void handleMessage(ToggleSoundMessage message) {}
 
     @Override public void setDirty() {
         SoundManagerSaveData.getData(minecraftServer.overworld()).setDirty();
+    }
+
+    @Override public void sync() {
+        sounds.forEach((soundId, sound) -> Network.CHANNEL.send(
+            getMessageTarget(sound),
+            new AddSoundMessage(soundId, sound)
+        ));
     }
 
     private PacketDistributor.PacketTarget getMessageTarget(Sound sound) {

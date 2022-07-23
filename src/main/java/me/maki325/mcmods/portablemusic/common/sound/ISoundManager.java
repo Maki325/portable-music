@@ -14,6 +14,7 @@ public interface ISoundManager {
     boolean playSound(int soundId);
     boolean stopSound(int soundId);
     boolean pauseSound(int soundId);
+    boolean setSoundState(int soundId, SoundState soundState);
 
     @Nullable Sound getSound(int soundId);
     @Nullable Sound getSound(Predicate<Sound> filter);
@@ -21,6 +22,8 @@ public interface ISoundManager {
     HashMap<Integer, Sound> getSounds();
     void setSounds(HashMap<Integer, Sound> sounds);
     void setDirty();
+    void clear();
+    void sync();
 
     void handleMessage(ToggleSoundMessage message);
 

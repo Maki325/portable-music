@@ -17,15 +17,12 @@ public class ClientSoundManager extends AbstractSoundManager {
 
     @Override
     public int addSound(int soundId, Sound sound) {
-        super.updateSound(soundId, sound);
-        var movableSound = movableSounds.get(soundId);
-        if(movableSound == null) return soundId;
-        movableSound.updatePosition(sound.location);
-        if(sound.playerUUID != null) {
-            movableSound.updateSource(getPlayer(sound.playerUUID));
-        } else {
-            movableSound.updateSource(null);
+        var soundState = sound.soundState;
+        if(!sounds.containsKey(soundId)) {
+            sound.soundState = SoundState.NONE;
         }
+        super.updateSound(soundId, sound);
+        setSoundState(soundId, soundState);
         return soundId;
     }
 
@@ -42,13 +39,12 @@ public class ClientSoundManager extends AbstractSoundManager {
             movableSound = movableSounds.get(soundId);
         }
 
-        if(sound.soundState == SoundState.PLAYING) {
-            if(sound.playerUUID != null) {
-                movableSound.updateSource(getPlayer(sound.playerUUID));
-            } else {
-                movableSound.updatePosition(sound.location);
-            }
-        } else {
+        movableSound.updatePosition(sound.location);
+        if(sound.playerUUID != null) {
+            movableSound.updateSource(getPlayer(sound.playerUUID));
+        }
+
+        if(sound.soundState != SoundState.PLAYING) {
             Minecraft.getInstance().getSoundManager().stop();
             Minecraft.getInstance().getSoundManager().play(movableSound);
         }
@@ -83,15 +79,22 @@ public class ClientSoundManager extends AbstractSoundManager {
         return true;
     }
 
+    @Override public boolean setSoundState(int soundId, SoundState soundState) {
+        return switch (soundState) {
+            case PLAYING -> playSound(soundId);
+            case PAUSED -> pauseSound(soundId);
+            case STOPPED, FINISHED -> stopSound(soundId);
+            default -> false;
+        };
+    }
+
     @Override public void handleMessage(ToggleSoundMessage message) {
-        switch (message.soundState) {
-            case PLAYING -> playSound(message.soundId);
-            case PAUSED -> pauseSound(message.soundId);
-            case STOPPED, FINISHED -> stopSound(message.soundId);
-        }
+        setSoundState(message.soundId, message.soundState);
     }
 
     @Override public void setDirty() {}
+
+    @Override public void sync() {}
 
     private static final ClientSoundManager soundManager = new ClientSoundManager();
 

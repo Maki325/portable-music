@@ -6,7 +6,6 @@ import me.maki325.mcmods.portablemusic.server.ServerSoundManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-import java.util.ArrayList;
 import java.util.function.Supplier;
 
 public class ToggleSoundMessage {
