@@ -20,9 +20,7 @@ public class EventHandler {
 
     @SubscribeEvent
     public static void onPlayerToss(ItemTossEvent event) {
-        if(!(event.getEntity() instanceof ItemEntity itemEntity)) {
-            return;
-        }
+        ItemEntity itemEntity = event.getEntity();
         Player player = event.getPlayer();
         if(!itemEntity.getItem().is(PMItems.BOOMBOX_ITEM.get())) return;
         var soundItemEntity = new SoundItemEntity(itemEntity.level, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), itemEntity.getItem());

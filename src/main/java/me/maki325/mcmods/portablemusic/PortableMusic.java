@@ -1,6 +1,7 @@
 package me.maki325.mcmods.portablemusic;
 
 import com.mojang.logging.LogUtils;
+import me.maki325.mcmods.portablemusic.client.ClientSoundManager;
 import me.maki325.mcmods.portablemusic.common.blockentities.PMBlockEntities;
 import me.maki325.mcmods.portablemusic.common.blocks.PMBlocks;
 import me.maki325.mcmods.portablemusic.common.capabilities.boombox.BoomboxProvider;
@@ -9,6 +10,7 @@ import me.maki325.mcmods.portablemusic.common.capabilities.boombox.IBoomboxCapab
 import me.maki325.mcmods.portablemusic.common.commands.PMCommands;
 import me.maki325.mcmods.portablemusic.common.items.PMItems;
 import me.maki325.mcmods.portablemusic.common.network.Network;
+import me.maki325.mcmods.portablemusic.common.sound.SoundState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -19,7 +21,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -29,7 +32,10 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Mod(PortableMusic.MODID)
 public class PortableMusic {
@@ -69,15 +75,15 @@ public class PortableMusic {
     }
 
     @SubscribeEvent
-    public void onEntityJoinWorld(EntityJoinWorldEvent event) {
+    public void onEntityJoinWorld(EntityJoinLevelEvent event) {
         // Some client setup code
         if(!(event.getEntity() instanceof Player)) return;
-        if(event.getWorld().isClientSide) return;
+        if(event.getLevel().isClientSide) return;
         LOGGER.info("EntityJoinWorldEvent");
         ServerPlayer joinedPlayer = (ServerPlayer) event.getEntity();
         LOGGER.info("Player! " + joinedPlayer);
 
-        List<Player> playerList = event.getWorld().getNearbyPlayers(
+        List<Player> playerList = event.getLevel().getNearbyPlayers(
                 TargetingConditions.forNonCombat(), joinedPlayer, joinedPlayer.getBoundingBox().inflate(10));
 
         for(Player player : playerList) {
@@ -123,11 +129,35 @@ public class PortableMusic {
             // Some client setup code
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+
+            // TODO: Change this when you figure how
             ItemBlockRenderTypes.setRenderLayer(PMBlocks.BOOMBOX_BLOCK.get(), RenderType.translucent());
-
-            // Minecraft.getInstance().getSoundManager().play(new MovableSound(Minecraft.getInstance().player, null));
         }
+    }
 
+    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    public static class ClientEvents {
+        private static boolean isPaused = false;
+        private static Map<Integer, SoundState> toUnpause = new HashMap<>();
+        @SubscribeEvent public static void tick(TickEvent.ClientTickEvent event) {
+            if(event.phase == TickEvent.Phase.START) return;
+            boolean newPaused = Minecraft.getInstance().isPaused();
+            if(newPaused != isPaused) {
+                if(newPaused) {
+                    toUnpause.clear();
+                    ClientSoundManager.getInstance().getSounds().forEach((soundId, sound) -> {
+                        toUnpause.put(soundId, sound.soundState);
+                        if(sound.soundState == SoundState.PLAYING) {
+                            ClientSoundManager.getInstance().pauseSound(soundId);
+                        }
+                    });
+                } else {
+                    toUnpause.forEach(ClientSoundManager.getInstance()::setSoundState);
+                    toUnpause.clear();
+                }
+                isPaused = newPaused;
+            }
+        }
     }
 
 

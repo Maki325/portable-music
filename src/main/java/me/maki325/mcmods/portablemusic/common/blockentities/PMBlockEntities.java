@@ -10,7 +10,7 @@ import net.minecraftforge.registries.RegistryObject;
 public class PMBlockEntities {
 
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
-        DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, PortableMusic.MODID);
+        DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, PortableMusic.MODID);
 
     public static final RegistryObject<BlockEntityType<BoomboxBlockEntity>> BOOMBOX_BLOCKENTITY =
         BLOCK_ENTITIES.register("boombox_block_entity",

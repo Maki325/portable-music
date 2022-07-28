@@ -68,6 +68,7 @@ public class ClientSoundManager extends AbstractSoundManager {
 
         if(channels.containsKey(soundId)) {
             channels.get(soundId).execute(Channel::stop);
+            channels.remove(soundId);
         }
 
         sound.soundState = SoundState.STOPPED;

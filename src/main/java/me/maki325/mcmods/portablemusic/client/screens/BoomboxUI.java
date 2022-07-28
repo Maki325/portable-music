@@ -66,7 +66,7 @@ public class BoomboxUI extends Screen {
         super(Component.translatable("screen." + PortableMusic.MODID + ".boombox"));
         this.soundId = soundId;
         this.sound = ClientSoundManager.getInstance().getSound(soundId);
-        if(sound != null && sound.soundState == SoundState.PLAYING)
+        if(sound != null && (sound.soundState == SoundState.PLAYING || sound.soundState == SoundState.PAUSED))
             rotation = random.nextInt(180) + random.nextInt(180) + 2;
     }
 
@@ -97,6 +97,7 @@ public class BoomboxUI extends Screen {
         RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE);
         this.blit(poseStack, relX, relY, 0, 0, WIDTH, HEIGHT);
 
+        this.sound = ClientSoundManager.getInstance().getSound(soundId);
         if(soundId == 0 || sound == null) {
             super.render(poseStack, mouseX, mouseY, partialTicks);
             return;
@@ -130,6 +131,14 @@ public class BoomboxUI extends Screen {
 
     public void syncSoundState(int soundId, SoundState soundState) {
         Network.CHANNEL.sendToServer(new ToggleSoundMessage(soundId, soundState));
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        if(soundId != 0 && sound != null) {
+            ClientSoundManager.getInstance().setSoundState(soundId, sound.soundState);
+        }
     }
 
     public static void open(int soundId) {
