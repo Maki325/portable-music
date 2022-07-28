@@ -1,7 +1,10 @@
 {
+  "itemGroup.portablemusic": "Portable Music",
   "screen.portablemusic.boombox": "Boombox",
 
   "button.portablemusic.play": "Play",
   "button.portablemusic.pause": "Pause",
-  "button.portablemusic.stop": "Stop"
+  "button.portablemusic.stop": "Stop",
+
+  "block.portablemusic.boombox": "Boombox"
 }

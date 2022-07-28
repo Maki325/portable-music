@@ -13,7 +13,7 @@ public class PMBlockEntities {
         DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, PortableMusic.MODID);
 
     public static final RegistryObject<BlockEntityType<BoomboxBlockEntity>> BOOMBOX_BLOCKENTITY =
-        BLOCK_ENTITIES.register("mybe",
+        BLOCK_ENTITIES.register("boombox_block_entity",
                 () -> BlockEntityType.Builder.of(BoomboxBlockEntity::new, BoomboxBlockEntity.VALID_BLOCKS).build(null));
 
 
