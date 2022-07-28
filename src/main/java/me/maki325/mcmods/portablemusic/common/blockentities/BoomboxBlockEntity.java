@@ -126,6 +126,10 @@ public class BoomboxBlockEntity extends BlockEntity {
         return getSoundFromItemStack(disc);
     }
 
+    public int getSoundId() {
+        return soundId;
+    }
+
     public double getTime() {
         return time;
     }

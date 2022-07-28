@@ -1,10 +1,12 @@
 package me.maki325.mcmods.portablemusic.client;
 
+import com.mojang.blaze3d.audio.Channel;
 import me.maki325.mcmods.portablemusic.common.network.ToggleSoundMessage;
 import me.maki325.mcmods.portablemusic.common.sound.AbstractSoundManager;
 import me.maki325.mcmods.portablemusic.common.sound.Sound;
 import me.maki325.mcmods.portablemusic.common.sound.SoundState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
@@ -14,9 +16,9 @@ import java.util.UUID;
 
 public class ClientSoundManager extends AbstractSoundManager {
     protected HashMap<Integer, MovableSound> movableSounds = new HashMap<>();
+    protected HashMap<Integer, ChannelAccess.ChannelHandle> channels = new HashMap<>();
 
-    @Override
-    public int addSound(int soundId, Sound sound) {
+    @Override public int addSound(int soundId, Sound sound) {
         var soundState = sound.soundState;
         if(!sounds.containsKey(soundId)) {
             sound.soundState = SoundState.NONE;
@@ -26,8 +28,7 @@ public class ClientSoundManager extends AbstractSoundManager {
         return soundId;
     }
 
-    @Override
-    public boolean playSound(int soundId) {
+    @Override public boolean playSound(int soundId) {
         var sound = sounds.get(soundId);
         if(sound == null) return false;
         var movableSound = movableSounds.get(soundId);
@@ -45,22 +46,30 @@ public class ClientSoundManager extends AbstractSoundManager {
         }
 
         if(sound.soundState != SoundState.PLAYING) {
-            Minecraft.getInstance().getSoundManager().stop();
-            Minecraft.getInstance().getSoundManager().play(movableSound);
+            if(channels.containsKey(soundId)) {
+                channels.get(soundId).execute(Channel::play);
+            } else {
+                Minecraft.getInstance().getSoundManager().play(movableSound);
+                channels.put(soundId,
+                    Minecraft.getInstance().getSoundManager().soundEngine.instanceToChannel.get(movableSound));
+            }
+
         }
         sound.soundState = SoundState.PLAYING;
 
         return true;
     }
 
-    @Override
-    public boolean stopSound(int soundId) {
+    @Override public boolean stopSound(int soundId) {
         var sound = sounds.get(soundId);
         if(sound == null) return false;
         var movableSound = movableSounds.get(soundId);
         if(movableSound == null) return false;
 
-        Minecraft.getInstance().getSoundManager().stop(movableSound);
+        if(channels.containsKey(soundId)) {
+            channels.get(soundId).execute(Channel::stop);
+        }
+
         sound.soundState = SoundState.STOPPED;
 
         return true;
@@ -73,7 +82,10 @@ public class ClientSoundManager extends AbstractSoundManager {
         var movableSound = movableSounds.get(soundId);
         if(movableSound == null) return false;
 
-        Minecraft.getInstance().getSoundManager().stop(movableSound);
+        if(channels.containsKey(soundId)) {
+            channels.get(soundId).execute(Channel::pause);
+        }
+
         sound.soundState = SoundState.PAUSED;
 
         return true;

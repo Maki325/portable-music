@@ -1,8 +1,10 @@
 package me.maki325.mcmods.portablemusic.common;
 
+import me.maki325.mcmods.portablemusic.PortableMusic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -63,5 +65,9 @@ public class Utils {
 
     public static BlockPos vec3ToBlockPos(Vec3 pos) {
         return new BlockPos(pos.x, pos.y, pos.z);
+    }
+
+    public static Component translatable(String key) {
+        return Component.translatable(key.replace("%_%", PortableMusic.MODID));
     }
 }

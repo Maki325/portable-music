@@ -73,7 +73,9 @@ public class ServerSoundManager extends AbstractSoundManager {
         return true;
     }
 
-    @Override public void handleMessage(ToggleSoundMessage message) {}
+    @Override public void handleMessage(ToggleSoundMessage message) {
+        setSoundState(message.soundId, message.soundState);
+    }
 
     @Override public void setDirty() {
         SoundManagerSaveData.getData(minecraftServer.overworld()).setDirty();

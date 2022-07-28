@@ -1,5 +1,6 @@
 package me.maki325.mcmods.portablemusic.common.blocks;
 
+import me.maki325.mcmods.portablemusic.client.screens.BoomboxUI;
 import me.maki325.mcmods.portablemusic.common.blockentities.BoomboxBlockEntity;
 import me.maki325.mcmods.portablemusic.common.blockentities.PMBlockEntities;
 import me.maki325.mcmods.portablemusic.common.entities.SoundItemEntity;
@@ -86,12 +87,15 @@ public class BoomboxBlock extends Block implements EntityBlock {
         if(!(itemStack.getItem() instanceof RecordItem)) {
             level.getBlockEntity(blockPos, PMBlockEntities.BOOMBOX_BLOCKENTITY.get())
             .ifPresent(blockEntity -> {
-                blockEntity.play();
                 String s = blockEntity.getSound() == null ? "No Sound" : ("Sound: " + blockEntity.getSound());
                 player.sendSystemMessage(Component.literal(s));
+
+                if(level.isClientSide) {
+                    BoomboxUI.open(blockEntity.getSoundId());
+                }
             });
 
-            return InteractionResult.PASS;
+            return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
         level.getBlockEntity(blockPos, PMBlockEntities.BOOMBOX_BLOCKENTITY.get())
