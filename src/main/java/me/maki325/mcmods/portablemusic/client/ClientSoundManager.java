@@ -91,6 +91,18 @@ public class ClientSoundManager extends AbstractSoundManager {
         return true;
     }
 
+    @Override public void removeSound(int soundId) {
+        super.removeSound(soundId);
+
+        if(movableSounds.containsKey(soundId))
+            Minecraft.getInstance().getSoundManager().stop(movableSounds.get(soundId));
+        movableSounds.remove(soundId);
+
+        if(channels.containsKey(soundId))
+            channels.get(soundId).execute(Channel::stop);
+        channels.remove(soundId);
+    }
+
     @Override public boolean setSoundState(int soundId, SoundState soundState) {
         return switch (soundState) {
             case PLAYING -> playSound(soundId);

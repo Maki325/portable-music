@@ -16,6 +16,7 @@ public interface ISoundManager {
     boolean stopSound(int soundId);
     boolean pauseSound(int soundId);
     boolean setSoundState(int soundId, SoundState soundState);
+    void removeSound(int soundId);
 
     @Nullable Sound getSound(int soundId);
     @Nullable Sound getSound(Predicate<Sound> filter);

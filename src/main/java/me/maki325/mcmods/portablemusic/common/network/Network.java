@@ -39,6 +39,13 @@ public class Network {
             AddSoundMessage::new,
             AddSoundMessage::handle
         );
+        CHANNEL.registerMessage(
+            discriminator++,
+            RemoveSoundMessage.class,
+            RemoveSoundMessage::encode,
+            RemoveSoundMessage::new,
+            RemoveSoundMessage::handle
+        );
     }
 
 }

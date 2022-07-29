@@ -79,22 +79,28 @@ public class BoomboxBlock extends Block implements EntityBlock {
 
     @Override public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
-        if(!(itemStack.getItem() instanceof RecordItem)) {
-            level.getBlockEntity(blockPos, PMBlockEntities.BOOMBOX_BLOCKENTITY.get())
-            .ifPresent(blockEntity -> {
-                String s = blockEntity.getSound() == null ? "No Sound" : ("Sound: " + blockEntity.getSound());
-                player.sendSystemMessage(Component.literal(s));
+        var blockEntity = level.getBlockEntity(blockPos, PMBlockEntities.BOOMBOX_BLOCKENTITY.get()).orElse(null);
+        if(blockEntity == null) return InteractionResult.sidedSuccess(level.isClientSide);
+        if(blockEntity.getDisc() != null) {
+            ItemStack stack = blockEntity.getDisc();
+            blockEntity.setDisc(null);
 
-                if(level.isClientSide) {
-                    BoomboxUI.open(blockEntity.getSoundId());
-                }
-            });
+            super.popResource(level, blockPos, stack);
+
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
+        if(!(itemStack.getItem() instanceof RecordItem)) {
+            String s = blockEntity.getSound() == null ? "No Sound" : ("Sound: " + blockEntity.getSound());
+            player.sendSystemMessage(Component.literal(s));
+
+            if(level.isClientSide) {
+                BoomboxUI.open(blockEntity.getSoundId());
+            }
 
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
-        level.getBlockEntity(blockPos, PMBlockEntities.BOOMBOX_BLOCKENTITY.get())
-                .ifPresent(blockEntity -> blockEntity.setDisc(itemStack));
+        blockEntity.setDisc(itemStack);
         itemStack.shrink(1);
 
         level.sendBlockUpdated(blockPos, blockState, blockState, Block.UPDATE_CLIENTS);

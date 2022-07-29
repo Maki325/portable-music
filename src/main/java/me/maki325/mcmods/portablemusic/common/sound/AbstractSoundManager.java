@@ -12,8 +12,7 @@ public abstract class AbstractSoundManager implements ISoundManager {
     protected HashMap<Integer, Sound> sounds = new HashMap<>();
     protected final Random random = new Random();
 
-    @Override
-    public int addSound(Sound sound) {
+    @Override public int addSound(Sound sound) {
         int soundId = random.nextInt();
         while(sounds.containsKey(soundId) || soundId == 0) soundId = random.nextInt();
 
@@ -22,22 +21,23 @@ public abstract class AbstractSoundManager implements ISoundManager {
         return soundId;
     }
 
-    @Override
-    public int addSound(int soundId, Sound sound) {
+    @Override public int addSound(int soundId, Sound sound) {
         sounds.put(soundId, sound);
         setDirty();
         return soundId;
     }
 
-    @Override
-    public void updateSound(int soundId, Sound sound) {
+    @Override public void updateSound(int soundId, Sound sound) {
         sounds.put(soundId, sound);
         setDirty();
     }
 
-    @Nullable
-    @Override
-    public Sound getSound(int soundId) {
+    @Override public void removeSound(int soundId) {
+        sounds.remove(soundId);
+        setDirty();
+    }
+
+    @Nullable @Override public Sound getSound(int soundId) {
         return sounds.get(soundId);
     }
 

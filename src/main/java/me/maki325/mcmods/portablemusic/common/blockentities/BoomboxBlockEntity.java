@@ -143,15 +143,30 @@ public class BoomboxBlockEntity extends BlockEntity {
     }
 
     public void setDisc(ItemStack disc) {
+        if(disc == null) {
+            this.disc = null;
+            ServerSoundManager.getInstance().removeSound(this.soundId);
+            this.soundId = 0;
+            this.sound = null;
+            this.time = 0;
+            setChanged();
+            return;
+        }
+        this.time = 0;
         this.disc = disc.copy();
         this.disc.setCount(1);
+        this.sound = new Sound(this.getSound(), vec3iToVec3(getBlockPos()), SoundState.FINISHED);
+        this.soundId = ServerSoundManager.getInstance().addSound(this.sound);
+        this.sound = ServerSoundManager.getInstance().getSound(this.soundId);
         setChanged();
     }
 
     @Override public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("sound", this.getSound())
-                .add("time", this.getTime())
-                .toString();
+            .add("sound", this.getSound())
+            .add("time", this.getTime())
+            .add("soundId", this.getSoundId())
+            .add("sound", this.sound)
+            .toString();
     }
 }
