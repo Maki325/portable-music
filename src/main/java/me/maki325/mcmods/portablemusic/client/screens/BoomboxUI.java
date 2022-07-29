@@ -19,6 +19,8 @@ import java.util.Random;
 
 public class BoomboxUI extends Screen {
 
+    private static boolean isOpened = false;
+
     public static final String PIGSTEP = "minecraft:music_disc.pigstep";
 
     private static final int WIDTH = 224;
@@ -133,15 +135,18 @@ public class BoomboxUI extends Screen {
         Network.CHANNEL.sendToServer(new ToggleSoundMessage(soundId, soundState));
     }
 
-    @Override
-    public void onClose() {
+    @Override public void onClose() {
         super.onClose();
         if(soundId != 0 && sound != null) {
             ClientSoundManager.getInstance().setSoundState(soundId, sound.soundState);
         }
+        isOpened = false;
     }
 
     public static void open(int soundId) {
-        Minecraft.getInstance().setScreen(new BoomboxUI(soundId));
+        if(!isOpened) {
+            isOpened = true;
+            Minecraft.getInstance().setScreen(new BoomboxUI(soundId));
+        }
     }
 }
