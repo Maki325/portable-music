@@ -8,6 +8,8 @@ import me.maki325.mcmods.portablemusic.common.sound.AbstractSoundManager;
 import me.maki325.mcmods.portablemusic.common.sound.Sound;
 import me.maki325.mcmods.portablemusic.common.sound.SoundState;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.PacketDistributor;
 
 import static me.maki325.mcmods.portablemusic.common.Utils.vec3ToBlockPos;
@@ -88,11 +90,18 @@ public class ServerSoundManager extends AbstractSoundManager {
         ));
     }
 
+    @Override public void sync(Player player) {
+        sounds.forEach((soundId, sound) -> Network.CHANNEL.send(
+            PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+            new AddSoundMessage(soundId, sound)
+        ));
+    }
+
     private PacketDistributor.PacketTarget getMessageTarget(Sound sound) {
         if(minecraftServer == null)
             return PacketDistributor.ALL.noArg();
         return PacketDistributor.TRACKING_CHUNK.with(() ->
-                minecraftServer.getLevel(sound.level).getChunkAt(vec3ToBlockPos(sound.location)));
+            minecraftServer.getLevel(sound.level).getChunkAt(vec3ToBlockPos(sound.location)));
     }
 
     private static final ServerSoundManager soundManager = new ServerSoundManager();

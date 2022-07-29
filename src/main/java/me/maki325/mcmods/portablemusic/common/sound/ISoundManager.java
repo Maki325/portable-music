@@ -1,6 +1,7 @@
 package me.maki325.mcmods.portablemusic.common.sound;
 
 import me.maki325.mcmods.portablemusic.common.network.ToggleSoundMessage;
+import net.minecraft.world.entity.player.Player;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ public interface ISoundManager {
     void setDirty();
     void clear();
     void sync();
+    void sync(Player player);
 
     void handleMessage(ToggleSoundMessage message);
 

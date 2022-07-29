@@ -1,5 +1,6 @@
 package me.maki325.mcmods.portablemusic.common.sound;
 
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -64,8 +65,9 @@ public abstract class AbstractSoundManager implements ISoundManager {
         this.sounds = sounds;
     }
 
-    @Override
-    public void clear() {
+    @Override public void clear() {
         sounds.clear();
     }
+
+    @Override public void sync(Player player) {}
 }

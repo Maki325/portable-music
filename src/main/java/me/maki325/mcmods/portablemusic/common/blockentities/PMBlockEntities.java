@@ -2,7 +2,7 @@ package me.maki325.mcmods.portablemusic.common.blockentities;
 
 import me.maki325.mcmods.portablemusic.PortableMusic;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -17,7 +17,7 @@ public class PMBlockEntities {
                 () -> BlockEntityType.Builder.of(BoomboxBlockEntity::new, BoomboxBlockEntity.VALID_BLOCKS).build(null));
 
 
-    public static void register() {
-        BLOCK_ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
+    public static void register(IEventBus eventBus) {
+        BLOCK_ENTITIES.register(eventBus);
     }
 }

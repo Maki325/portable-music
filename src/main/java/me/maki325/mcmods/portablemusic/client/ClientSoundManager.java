@@ -63,6 +63,8 @@ public class ClientSoundManager extends AbstractSoundManager {
     @Override public boolean stopSound(int soundId) {
         var sound = sounds.get(soundId);
         if(sound == null) return false;
+        sound.soundState = SoundState.STOPPED;
+
         var movableSound = movableSounds.get(soundId);
         if(movableSound == null) return false;
 
@@ -71,23 +73,20 @@ public class ClientSoundManager extends AbstractSoundManager {
             channels.remove(soundId);
         }
 
-        sound.soundState = SoundState.STOPPED;
-
         return true;
     }
 
-    @Override
-    public boolean pauseSound(int soundId) {
+    @Override public boolean pauseSound(int soundId) {
         var sound = sounds.get(soundId);
         if(sound == null) return false;
+        sound.soundState = SoundState.PAUSED;
+
         var movableSound = movableSounds.get(soundId);
         if(movableSound == null) return false;
 
         if(channels.containsKey(soundId)) {
             channels.get(soundId).execute(Channel::pause);
         }
-
-        sound.soundState = SoundState.PAUSED;
 
         return true;
     }
@@ -109,6 +108,12 @@ public class ClientSoundManager extends AbstractSoundManager {
 
     @Override public void sync() {}
 
+    @Override public void clear() {
+        super.clear();
+        movableSounds.clear();
+        channels.clear();
+    }
+
     private static final ClientSoundManager soundManager = new ClientSoundManager();
 
     public static ClientSoundManager getInstance() {
@@ -116,6 +121,7 @@ public class ClientSoundManager extends AbstractSoundManager {
     }
 
     private Player getPlayer(UUID playerUUID) {
+        if(Minecraft.getInstance() == null || Minecraft.getInstance().level == null) return null;
         return Minecraft.getInstance().level.getPlayerByUUID(playerUUID);
     }
 }

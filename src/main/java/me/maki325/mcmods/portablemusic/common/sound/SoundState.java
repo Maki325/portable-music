@@ -20,6 +20,7 @@ public enum SoundState {
 
     @Override public String toString() {
         return switch (value) {
+            case 0 -> "NONE";
             case 1 -> "PLAYING";
             case 2 -> "PAUSED";
             case 3 -> "STOPPED";
