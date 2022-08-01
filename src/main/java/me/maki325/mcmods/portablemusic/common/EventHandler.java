@@ -1,6 +1,8 @@
 package me.maki325.mcmods.portablemusic.common;
 
 import me.maki325.mcmods.portablemusic.PortableMusic;
+import me.maki325.mcmods.portablemusic.common.capabilites.boombox.IBoomboxCapability;
+import me.maki325.mcmods.portablemusic.common.capabilites.inventory.BoomboxItemStackHandler;
 import me.maki325.mcmods.portablemusic.common.entities.SoundItemEntity;
 import me.maki325.mcmods.portablemusic.common.items.PMItems;
 import me.maki325.mcmods.portablemusic.common.savedata.SoundManagerSaveData;
@@ -9,6 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
@@ -53,6 +56,11 @@ public class EventHandler {
     @SubscribeEvent public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if(!(event.getEntity() instanceof ServerPlayer)) return;
         ServerSoundManager.getInstance().sync(event.getEntity());
+    }
+
+    @SubscribeEvent public static void registerCaps(RegisterCapabilitiesEvent event) {
+        event.register(IBoomboxCapability.class);
+        event.register(BoomboxItemStackHandler.class);
     }
 
 }

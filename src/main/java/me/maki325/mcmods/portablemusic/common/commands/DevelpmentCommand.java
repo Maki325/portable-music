@@ -28,6 +28,11 @@ public class DevelpmentCommand {
                     if (!(context.getSource().getEntity() instanceof ServerPlayer)) {
                         return 0;
                     }
+                    if(ServerSoundManager.getInstance().getSounds().isEmpty()) {
+                        context.getSource().getEntity().sendSystemMessage(Component.literal("There are no sounds!"));
+                        return Command.SINGLE_SUCCESS;
+                    }
+                    context.getSource().getEntity().sendSystemMessage(Component.literal("The sounds are:"));
                     ServerSoundManager.getInstance().getSounds()
                         .forEach((key, value) -> {
                             String str = "Key(" + key + "): " + value;

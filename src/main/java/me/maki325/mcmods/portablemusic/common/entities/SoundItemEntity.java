@@ -1,9 +1,9 @@
 package me.maki325.mcmods.portablemusic.common.entities;
 
+import me.maki325.mcmods.portablemusic.common.capabilites.boombox.BoomboxProvider;
 import me.maki325.mcmods.portablemusic.common.sound.Sound;
 import me.maki325.mcmods.portablemusic.server.ServerSoundManager;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -36,13 +36,18 @@ public class SoundItemEntity extends ItemEntity {
 
     public void initSound() {
         if(this.level.isClientSide) return;
-        CompoundTag tag = getItem().getOrCreateTag();
-        if(!tag.getBoolean("hasDisc")) return;
-        this.soundId = tag.getInt("soundId");
+
+        getItem().getCapability(BoomboxProvider.BOOMBOX_CAPABILITY).ifPresent((handler) -> {
+            this.soundId = handler.getSoundId();
+        });
+
         if(this.soundId != 0) {
             this.sound = ServerSoundManager.getInstance().getSound(this.soundId);
-            this.sound.playerUUID = null;
-            ServerSoundManager.getInstance().updateSound(this.soundId, this.sound);
+
+            if(this.sound != null) {
+                this.sound.playerUUID = null;
+                ServerSoundManager.getInstance().updateSound(this.soundId, this.sound);
+            }
         }
     }
 
@@ -78,9 +83,14 @@ public class SoundItemEntity extends ItemEntity {
                 player.awardStat(Stats.ITEM_PICKED_UP.get(item), i);
                 player.onItemPickup(this);
 
-                this.sound.location = player.position();
-                this.sound.playerUUID = player.getUUID();
-                ServerSoundManager.getInstance().updateSound(soundId, this.sound);
+                if(this.sound == null) {
+                    this.sound = ServerSoundManager.getInstance().getSound(this.soundId);
+                }
+                if(this.sound != null) {
+                    this.sound.location = player.position();
+                    this.sound.playerUUID = player.getUUID();
+                    ServerSoundManager.getInstance().updateSound(soundId, this.sound);
+                }
             }
 
         }

@@ -1,23 +1,23 @@
 package me.maki325.mcmods.portablemusic.common.blocks;
 
-import me.maki325.mcmods.portablemusic.client.screens.BoomboxUI;
 import me.maki325.mcmods.portablemusic.common.blockentities.BoomboxBlockEntity;
 import me.maki325.mcmods.portablemusic.common.blockentities.PMBlockEntities;
 import me.maki325.mcmods.portablemusic.common.entities.SoundItemEntity;
+import me.maki325.mcmods.portablemusic.common.menus.BoomboxMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.GameRules;
@@ -37,6 +37,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
@@ -78,32 +79,13 @@ public class BoomboxBlock extends Block implements EntityBlock {
     }
 
     @Override public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
-        ItemStack itemStack = player.getItemInHand(interactionHand);
-        var blockEntity = level.getBlockEntity(blockPos, PMBlockEntities.BOOMBOX_BLOCKENTITY.get()).orElse(null);
-        if(blockEntity == null) return InteractionResult.sidedSuccess(level.isClientSide);
-        if(blockEntity.getDisc() != null) {
-            ItemStack stack = blockEntity.getDisc();
-            blockEntity.setDisc(null);
-
-            super.popResource(level, blockPos, stack);
-
-            return InteractionResult.sidedSuccess(level.isClientSide);
+        if (!level.isClientSide && level.getBlockEntity(blockPos) instanceof BoomboxBlockEntity boomboxBlockEntity) {
+            var container = new SimpleMenuProvider(
+                BoomboxMenu.getServerContainer(boomboxBlockEntity, blockPos),
+                BoomboxBlockEntity.TITLE
+            );
+            NetworkHooks.openScreen((ServerPlayer) player, container, blockPos);
         }
-        if(!(itemStack.getItem() instanceof RecordItem)) {
-            String s = blockEntity.getSound() == null ? "No Sound" : ("Sound: " + blockEntity.getSound());
-            player.sendSystemMessage(Component.literal(s));
-
-            if(level.isClientSide) {
-                BoomboxUI.open(blockEntity.getSoundId());
-            }
-
-            return InteractionResult.sidedSuccess(level.isClientSide);
-        }
-
-        blockEntity.setDisc(itemStack);
-        itemStack.shrink(1);
-
-        level.sendBlockUpdated(blockPos, blockState, blockState, Block.UPDATE_CLIENTS);
 
         return InteractionResult.sidedSuccess(level.isClientSide);
     }

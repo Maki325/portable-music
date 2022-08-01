@@ -31,6 +31,14 @@ public class Sound {
         this.playerUUID = playerUUID;
     }
 
+    public Sound(String sound, ResourceKey<Level> level, Vec3 location, SoundState soundState, UUID playerUUID) {
+        this.sound = sound;
+        this.level = level;
+        this.location = location;
+        this.soundState = soundState;
+        this.playerUUID = playerUUID;
+    }
+
     public Sound(String sound, ResourceKey<Level> level, Vec3 location, SoundState soundState) {
         this.sound = sound;
         this.level = level;

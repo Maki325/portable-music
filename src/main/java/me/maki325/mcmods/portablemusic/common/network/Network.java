@@ -46,6 +46,13 @@ public class Network {
             RemoveSoundMessage::new,
             RemoveSoundMessage::handle
         );
+        CHANNEL.registerMessage(
+            discriminator++,
+            OpenUIFromServerMessage.class,
+            OpenUIFromServerMessage::encode,
+            OpenUIFromServerMessage::new,
+            OpenUIFromServerMessage::handle
+        );
     }
 
 }

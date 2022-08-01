@@ -1,8 +1,9 @@
 package me.maki325.mcmods.portablemusic.client;
 
 import me.maki325.mcmods.portablemusic.PortableMusic;
-import me.maki325.mcmods.portablemusic.client.screens.BoomboxUI;
 import me.maki325.mcmods.portablemusic.common.items.PMItems;
+import me.maki325.mcmods.portablemusic.common.network.Network;
+import me.maki325.mcmods.portablemusic.common.network.OpenUIFromServerMessage;
 import me.maki325.mcmods.portablemusic.common.sound.SoundState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
@@ -30,13 +31,12 @@ public class ClientForgeEventHandler {
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent event) {
         if(event.phase == TickEvent.Phase.START) return;
 
-        if(Keybinds.openBoombox.isDown()) {
+        if(Keybinds.openBoombox.consumeClick()) {
             ItemStack itemStack = Minecraft.getInstance().player.getItemInHand(InteractionHand.MAIN_HAND);
             if(itemStack != null && itemStack.is(PMItems.BOOMBOX_ITEM.get())) {
-                var soundId = itemStack.getOrCreateTag().getInt("soundId");
-                BoomboxUI.open(soundId);
+                Network.CHANNEL.sendToServer(new OpenUIFromServerMessage());
             }
-        }
+         }
 
         boolean newPaused = Minecraft.getInstance().isPaused();
         if(newPaused != isPaused) {

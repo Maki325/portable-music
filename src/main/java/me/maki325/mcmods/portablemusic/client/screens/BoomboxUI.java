@@ -5,27 +5,28 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import me.maki325.mcmods.portablemusic.PortableMusic;
 import me.maki325.mcmods.portablemusic.client.ClientSoundManager;
-import me.maki325.mcmods.portablemusic.common.Utils;
+import me.maki325.mcmods.portablemusic.common.menus.BoomboxMenu;
 import me.maki325.mcmods.portablemusic.common.network.Network;
 import me.maki325.mcmods.portablemusic.common.network.ToggleSoundMessage;
 import me.maki325.mcmods.portablemusic.common.sound.Sound;
 import me.maki325.mcmods.portablemusic.common.sound.SoundState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
 import java.util.Random;
 
-public class BoomboxUI extends Screen {
+import static me.maki325.mcmods.portablemusic.common.Utils.translatable;
 
-    private static boolean isOpened = false;
+public class BoomboxUI extends AbstractContainerScreen<BoomboxMenu> {
 
     public static final String PIGSTEP = "minecraft:music_disc.pigstep";
 
-    private static final int WIDTH = 224;
-    private static final int HEIGHT = 134;
-    private static final int DISC_SIZE = 102;
+    private static final int WIDTH = 176;
+    private static final int HEIGHT = 166;
+    private static final int DISC_SIZE = 66;
 
     private int soundId;
     private Sound sound;
@@ -33,7 +34,7 @@ public class BoomboxUI extends Screen {
     private Random random = new Random();
 
     private final ResourceLocation BACKGROUND_TEXTURE =
-        new ResourceLocation(PortableMusic.MODID, "textures/gui/boombox-background.png");
+        new ResourceLocation(PortableMusic.MODID, "textures/gui/container/boombox-container.png");
     private final ResourceLocation PIGSTEP_TEXTURE =
         new ResourceLocation(PortableMusic.MODID, "textures/discs/boombox-pigstep.png");
     private final ResourceLocation UNKNOWN_SOUND_TEXTURE =
@@ -48,12 +49,12 @@ public class BoomboxUI extends Screen {
     private final IconButton play = new IconButton(0, 0, 20, 20, PLAY_ICON,
         (b) -> syncSoundState(soundId, SoundState.PLAYING),
         (b, poseStack, x, y) ->
-            this.renderTooltip(poseStack, Utils.translatable("button.%_%.play"), x, y)
+            this.renderTooltip(poseStack, translatable("button.%_%.play"), x, y)
     );
     private final IconButton pause = new IconButton(0, 0, 20, 20, PAUSE_ICON,
         (b) -> syncSoundState(soundId, SoundState.PAUSED),
         (b, poseStack, x, y) ->
-            this.renderTooltip(poseStack, Utils.translatable("button.%_%.pause"), x, y)
+            this.renderTooltip(poseStack, translatable("button.%_%.pause"), x, y)
     );
     private final IconButton stop = new IconButton(0, 0, 20, 20, STOP_ICON,
         (b) -> {
@@ -61,12 +62,12 @@ public class BoomboxUI extends Screen {
             rotation = 0;
         },
         (b, poseStack, x, y) ->
-            this.renderTooltip(poseStack, Utils.translatable("button.%_%.stop"), x, y)
+            this.renderTooltip(poseStack, translatable("button.%_%.stop"), x, y)
     );
 
-    public BoomboxUI(int soundId) {
-        super(Component.translatable("screen." + PortableMusic.MODID + ".boombox"));
-        this.soundId = soundId;
+    public BoomboxUI(BoomboxMenu container, Inventory playerInventory, Component component) {
+        super(container, playerInventory, component);
+        this.soundId = container.data.get(0);
         this.sound = ClientSoundManager.getInstance().getSound(soundId);
         if(sound != null && (sound.soundState == SoundState.PLAYING || sound.soundState == SoundState.PAUSED))
             rotation = random.nextInt(180) + random.nextInt(180) + 2;
@@ -77,8 +78,9 @@ public class BoomboxUI extends Screen {
     }
 
     @Override protected void init() {
-        int posX = (this.width - WIDTH) / 2 + 20;
-        int posY = (this.height - HEIGHT) / 2 + HEIGHT - 20 - 16;
+        super.init();
+        int posX = (this.width - WIDTH) / 2 + 15;
+        int posY = (this.height - HEIGHT) / 2 + HEIGHT / 4;
 
         play.x = posX + 30 * 0;
         play.y = posY;
@@ -93,15 +95,25 @@ public class BoomboxUI extends Screen {
         addRenderableWidget(stop);
     }
 
-    @Override public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    @Override protected void renderBg(PoseStack poseStack, float p_97788_, int p_97789_, int p_97790_) {
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, this.BACKGROUND_TEXTURE);
+
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
-        RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE);
-        this.blit(poseStack, relX, relY, 0, 0, WIDTH, HEIGHT);
+        this.blit(poseStack, relX, relY, 0, 0, 176, 166);
+    }
 
+    @Override public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        super.render(poseStack, mouseX, mouseY, partialTicks);
+
+        int relX = (this.width - WIDTH) / 2;
+        int relY = (this.height - HEIGHT) / 2;
+
+        this.soundId = this.menu.data.get(0);
         this.sound = ClientSoundManager.getInstance().getSound(soundId);
         if(soundId == 0 || sound == null) {
-            super.render(poseStack, mouseX, mouseY, partialTicks);
             return;
         }
         if(sound.soundState == SoundState.PLAYING)
@@ -122,13 +134,11 @@ public class BoomboxUI extends Screen {
         });
 
         poseStack.pushPose();
-        poseStack.translate(relX + 164, relY + 66, 0);
+        poseStack.translate(relX + 139, relY + 42, 0);
         poseStack.mulPose(Vector3f.ZP.rotation(rotation));
-        blit(poseStack, -51, -51, 0, 0F, 0F, DISC_SIZE, DISC_SIZE, DISC_SIZE, DISC_SIZE);
+        blit(poseStack, -33, -33, 0, 0F, 0F, DISC_SIZE, DISC_SIZE, DISC_SIZE, DISC_SIZE);
 
         poseStack.popPose();
-
-        super.render(poseStack, mouseX, mouseY, partialTicks);
     }
 
     public void syncSoundState(int soundId, SoundState soundState) {
@@ -140,13 +150,6 @@ public class BoomboxUI extends Screen {
         if(soundId != 0 && sound != null) {
             ClientSoundManager.getInstance().setSoundState(soundId, sound.soundState);
         }
-        isOpened = false;
     }
 
-    public static void open(int soundId) {
-        if(!isOpened) {
-            isOpened = true;
-            Minecraft.getInstance().setScreen(new BoomboxUI(soundId));
-        }
-    }
 }

@@ -70,4 +70,8 @@ public class Utils {
     public static Component translatable(String key) {
         return Component.translatable(key.replace("%_%", PortableMusic.MODID));
     }
+
+    public static Component translatable(String key, String value) {
+        return Component.translatable(key + "." + PortableMusic.MODID + "." + value);
+    }
 }
