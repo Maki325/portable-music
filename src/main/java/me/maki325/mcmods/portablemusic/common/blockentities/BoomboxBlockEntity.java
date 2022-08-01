@@ -144,6 +144,10 @@ public class BoomboxBlockEntity extends BlockEntity {
         return soundId;
     }
 
+    public void setSoundId(int soundId) {
+        this.soundId = soundId;
+    }
+
     public double getTime() {
         return time;
     }

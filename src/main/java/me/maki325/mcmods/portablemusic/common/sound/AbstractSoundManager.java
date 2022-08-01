@@ -12,9 +12,17 @@ public abstract class AbstractSoundManager implements ISoundManager {
     protected HashMap<Integer, Sound> sounds = new HashMap<>();
     protected final Random random = new Random();
 
+    private int getRandomId() {
+        // Container data seems to not sync more than 32768
+        // So I'll limit it to that number for now
+        // Though, no server should have even close to that many sounds
+        // Active at once, so it should be fine
+        return random.nextInt() % 32768;
+    }
+
     @Override public int addSound(Sound sound) {
-        int soundId = random.nextInt();
-        while(sounds.containsKey(soundId) || soundId == 0) soundId = random.nextInt();
+        int soundId = getRandomId();
+        while(sounds.containsKey(soundId) || soundId == 0) soundId = getRandomId();
 
         sounds.put(soundId, sound);
         setDirty();
