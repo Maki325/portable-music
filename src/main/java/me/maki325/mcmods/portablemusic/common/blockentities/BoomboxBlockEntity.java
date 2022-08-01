@@ -107,10 +107,11 @@ public class BoomboxBlockEntity extends BlockEntity {
             }
         });
         itemStack.getCapability(BoomboxProvider.BOOMBOX_CAPABILITY).ifPresent((handler) -> {
-            if(this.soundId != 0) {
+            var soundId = handler.getSoundId();
+            if(this.soundId != 0 && this.soundId != soundId) {
                 ServerSoundManager.getInstance().removeSound(this.soundId);
             }
-            this.soundId = handler.getSoundId();
+            this.soundId = soundId;
             this.time = handler.getTime();
         });
 
