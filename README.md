@@ -1,5 +1,5 @@
 # Portable Music
-<img src="resources/PortableMusic.png" alt="drawing" width="64"/>
+<img src="resources/PortableMusic.png" alt="drawing" width="128"/>
 
 ## Ever wanted to bring the music with you? Well now you can!
 
@@ -18,7 +18,6 @@ When holding the Boombox item in hand you can press `B` to open the same screen.
 
 
 ## Recipes
----
 
 ### Boombox
 
