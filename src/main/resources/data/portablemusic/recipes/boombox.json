@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "s": {
+      "item": "minecraft:stick"
+    },
+    "n": {
+      "item": "minecraft:note_block"
+    },
+    "j": {
+      "item": "minecraft:jukebox"
+    }
+  },
+  "pattern": [
+    "isi",
+    "njn",
+    "iii"
+  ],
+  "result": {
+    "item": "portablemusic:boombox"
+  }
+}

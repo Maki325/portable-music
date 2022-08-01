@@ -12,7 +12,7 @@ public class PMItems {
             DeferredRegister.create(ForgeRegistries.ITEMS, PortableMusic.MODID);
 
     public static final RegistryObject<Item> BOOMBOX_ITEM =
-            ITEMS.register("boombox", () -> new BoomboxItem());
+            ITEMS.register("boombox", BoomboxItem::new);
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

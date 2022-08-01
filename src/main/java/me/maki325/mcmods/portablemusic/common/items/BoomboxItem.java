@@ -8,7 +8,7 @@ public class BoomboxItem extends BlockItem {
 
     public BoomboxItem() {
         super(PMBlocks.BOOMBOX_BLOCK.get(),
-                new Item.Properties().tab(CreativeModeTabs.PORTABLE_MUSIC_TAB));
+                new Item.Properties().tab(CreativeModeTabs.PORTABLE_MUSIC_TAB).stacksTo(1));
         this.registerBlocks(Item.BY_BLOCK, this);
     }
 
