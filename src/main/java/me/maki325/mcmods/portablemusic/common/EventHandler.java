@@ -5,6 +5,8 @@ import me.maki325.mcmods.portablemusic.common.capabilites.boombox.IBoomboxCapabi
 import me.maki325.mcmods.portablemusic.common.capabilites.inventory.BoomboxItemStackHandler;
 import me.maki325.mcmods.portablemusic.common.entities.SoundItemEntity;
 import me.maki325.mcmods.portablemusic.common.items.PMItems;
+import me.maki325.mcmods.portablemusic.common.network.ClearSoundsMessage;
+import me.maki325.mcmods.portablemusic.common.network.Network;
 import me.maki325.mcmods.portablemusic.common.savedata.SoundManagerSaveData;
 import me.maki325.mcmods.portablemusic.server.ServerSoundManager;
 import net.minecraft.nbt.CompoundTag;
@@ -17,6 +19,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
 
 @Mod.EventBusSubscriber(modid = PortableMusic.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class EventHandler {
@@ -54,8 +57,12 @@ public class EventHandler {
     }
 
     @SubscribeEvent public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        if(!(event.getEntity() instanceof ServerPlayer)) return;
-        ServerSoundManager.getInstance().sync(event.getEntity());
+        if(!(event.getEntity() instanceof ServerPlayer serverPlayer)) return;
+        Network.CHANNEL.send(
+            PacketDistributor.PLAYER.with(() -> serverPlayer),
+            new ClearSoundsMessage()
+        );
+        ServerSoundManager.getInstance().sync(serverPlayer);
     }
 
     @SubscribeEvent public static void registerCaps(RegisterCapabilitiesEvent event) {

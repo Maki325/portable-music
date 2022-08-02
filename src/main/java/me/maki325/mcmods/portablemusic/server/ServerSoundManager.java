@@ -2,6 +2,7 @@ package me.maki325.mcmods.portablemusic.server;
 
 import me.maki325.mcmods.portablemusic.common.network.AddSoundMessage;
 import me.maki325.mcmods.portablemusic.common.network.Network;
+import me.maki325.mcmods.portablemusic.common.network.RemoveSoundMessage;
 import me.maki325.mcmods.portablemusic.common.network.ToggleSoundMessage;
 import me.maki325.mcmods.portablemusic.common.savedata.SoundManagerSaveData;
 import me.maki325.mcmods.portablemusic.common.sound.AbstractSoundManager;
@@ -59,6 +60,16 @@ public class ServerSoundManager extends AbstractSoundManager {
 
     @Override public boolean pauseSound(int soundId) {
         return true;
+    }
+
+    @Override public void removeSound(int soundId) {
+        if(sounds.containsKey(soundId)) {
+            Network.CHANNEL.send(
+                getMessageTarget(sounds.get(soundId)),
+                new RemoveSoundMessage(soundId)
+            );
+        }
+        super.removeSound(soundId);
     }
 
     @Override public boolean setSoundState(int soundId, SoundState soundState) {

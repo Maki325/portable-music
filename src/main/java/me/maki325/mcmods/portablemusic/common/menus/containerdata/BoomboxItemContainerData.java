@@ -1,10 +1,8 @@
 package me.maki325.mcmods.portablemusic.common.menus.containerdata;
 
-import me.maki325.mcmods.portablemusic.common.blockentities.BoomboxBlockEntity;
 import me.maki325.mcmods.portablemusic.common.capabilites.boombox.BoomboxProvider;
 import me.maki325.mcmods.portablemusic.common.capabilites.boombox.IBoomboxCapability;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.ItemStack;
 
 public class BoomboxItemContainerData implements ContainerData {

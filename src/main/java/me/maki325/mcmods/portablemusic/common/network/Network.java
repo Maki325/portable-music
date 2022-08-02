@@ -27,13 +27,6 @@ public class Network {
         );
         CHANNEL.registerMessage(
             discriminator++,
-            SyncBoomboxTileEntity.class,
-            SyncBoomboxTileEntity::encode,
-            SyncBoomboxTileEntity::new,
-            SyncBoomboxTileEntity::handle
-        );
-        CHANNEL.registerMessage(
-            discriminator++,
             AddSoundMessage.class,
             AddSoundMessage::encode,
             AddSoundMessage::new,
@@ -52,6 +45,13 @@ public class Network {
             OpenUIFromServerMessage::encode,
             OpenUIFromServerMessage::new,
             OpenUIFromServerMessage::handle
+        );
+        CHANNEL.registerMessage(
+            discriminator++,
+            ClearSoundsMessage.class,
+            ClearSoundsMessage::encode,
+            ClearSoundsMessage::new,
+            ClearSoundsMessage::handle
         );
     }
 
